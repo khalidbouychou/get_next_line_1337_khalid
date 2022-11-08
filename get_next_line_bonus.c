@@ -6,7 +6,7 @@
 /*   By: khbouych <khbouych@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 13:57:03 by khbouych          #+#    #+#             */
-/*   Updated: 2022/11/05 14:39:22 by khbouych         ###   ########.fr       */
+/*   Updated: 2022/11/07 18:33:20 by khbouych         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,36 +37,36 @@ static char	*ft_read_line(char *src)
 	return (str);
 }
 
-static char	*ft_save(char *save)
+static char	*ft_set_on_stash(char *save)
 {
 	int		i;
-	int		c;
+	int		j;
 	char	*s;
 
 	i = 0;
-	while (save[i] && save[i] != '\n')
+	while (save[i] != '\0' && save[i] != '\n')
 		i++;
 	if (!save[i])
 	{
 		free(save);
 		return (NULL);
 	}
-	s = (char *)malloc(sizeof(char) * (ft_strlen(save) - i + 1));
+	s = (char *)malloc(ft_strlen(save) - i + 1);
 	if (!s)
 		return (NULL);
 	i++;
-	c = 0;
+	j = 0;
 	while (save[i])
-		s[c++] = save[i++];
-	s[c] = '\0';
+		s[j++] = save[i++];
+	s[j] = '\0';
 	free(save);
 	return (s);
 }
 
-static char	*get_line(char *src, int fd)
+static char	*ft_get_line(char *stash, int fd)
 {
 	char	*buffer;
-	int		ret;
+	int		read_file;
 
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (buffer == NULL)
@@ -74,57 +74,41 @@ static char	*get_line(char *src, int fd)
 		free(buffer);
 		return (NULL);
 	}
-	ret = 1;
-	while (ret != 0 && !ft_strchr(src, '\n'))
+	read_file = 1;
+	while (read_file != 0 && !ft_strchr(stash, '\n'))
 	{
-		ret = read(fd, buffer, BUFFER_SIZE);
-		if (ret == -1)
+		read_file = read(fd, buffer, BUFFER_SIZE);
+		if (read_file == -1)
 		{
 			free(buffer);
+			free(stash);
 			return (NULL);
 		}
-		buffer[ret] = '\0';
-		src = ft_strjoin(src, buffer);
+		buffer[read_file] = '\0';
+		stash = ft_strjoin(stash, buffer);
 	}
 	free(buffer);
-	return (src);
+	return (stash);
 }
 
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*rec[10240];
+	static char	*stash[10240];
 
 	line = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	rec[fd] = get_line(rec[fd], fd);
-	if (rec[fd] == NULL)
+	stash[fd] = ft_get_line(stash[fd], fd);
+	if (stash[fd] == NULL)
 		return (NULL);
-	line = ft_read_line(rec[fd]);
-	rec[fd] = ft_save(rec[fd]);
+	line = ft_read_line(stash[fd]);
+	stash[fd] = ft_set_on_stash(stash[fd]);
 	if (line[0] == '\0')
 	{
-		free(rec[fd]);
+		free(stash[fd]);
 		free(line);
 		return (NULL);
 	}
 	return (line);
 }
-// int main ()
-// {
-// 		int fd = open("temp.txt", O_RDONLY);
-//         int fd2 =open("file.txt" , O_RDONLY);
-// 		printf("fd : %d\n",fd);
-// 		printf("fd2 : %d\n",fd2);
-// 		printf("gnl | fd 1: %s",get_next_line(fd));
-// 		printf("gnl | fd2 1: %s",get_next_line(fd2));
-// 		printf("gnl | fd 2: %s",get_next_line(fd));
-// 		printf("gnl | fd2 2: %s",get_next_line(fd2));
-// 		printf("gnl | fd 3: %s",get_next_line(fd));
-// 		printf("gnl | fd2 3: %s",get_next_line(fd2));
-// 		printf("gnl | fd 4: %s",get_next_line(fd));
-// 		printf("gnl | fd2 4: %s",get_next_line(fd2));
-// 		close(fd);
-// 		return (0);
-// }
