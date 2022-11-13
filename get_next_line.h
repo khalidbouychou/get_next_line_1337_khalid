@@ -6,7 +6,7 @@
 /*   By: khbouych <khbouych@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 13:55:19 by khbouych          #+#    #+#             */
-/*   Updated: 2022/11/06 17:23:18 by khbouych         ###   ########.fr       */
+/*   Updated: 2022/11/13 15:43:06 by khbouych         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 9999
+#  define BUFFER_SIZE 42
 # endif
 
 int		ft_strlen(char *str);
